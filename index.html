@@ -134,25 +134,23 @@
                     }
                 },
                 onPrev: function(){
-                    this.isPicked=false;
-                    this.isCorrect=false;
-                    this.isLoading=false;
                     let index = this.current_i-1;
                     this.toPage(index);
                 },
                 onNext: function(){
-                    this.isPicked=false;
-                    this.isCorrect=false;
                     let index = this.current_i+1;
                     this.toPage(index);
                 },
                 toPage: function(page){
                     var self=this;
-                    self.isLoading = true;
+                    this.isPicked=false;
+                    this.isCorrect=false;
+                    this.isLoading = true;
                     setTimeout(function(){
                         self.isLoading = false;
                         self.current_i = page;
                         Cookies.set('question', self.current_i);
+                        $('#app').focus();
                     }, 100);
                 },
                 toQuestion: function(){
@@ -174,7 +172,7 @@
                     this.$buefy.dialog.confirm({
                         message: '是否确定从头开始?',
                         onConfirm: function(){
-                            self.current_i=0;
+                            self.toPage(0);
                         }
                     })
                 }
