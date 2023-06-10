@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <b-navbar>
+            <template #brand>
+                <b-navbar-item>
+                    <img src="favicon.png" alt="logo">
+                    <div class="title is-5 pl-3">法例選擇題-學士&高等專科</div>
+                </b-navbar-item>
+            </template>
+            <template #start>
+                <b-navbar-item href="#">首页</b-navbar-item>
+                <b-navbar-item href="#" @click="toQuestion">选题</b-navbar-item>
+                <b-navbar-item href="#" @click="resetAll">重置</b-navbar-item>
+            </template>
+        </b-navbar>
+        <div class="container is-fluid my-5">
+            <div>
+                <div class="title">{{current_q.question}}</div>
+                <div class="buttons mx-5">
+                    <b-button :type="optionA_style" @click="onSubmit('A')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerA}}</b-button>
+                    <b-button :type="optionB_style" @click="onSubmit('B')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerB}}</b-button>
+                    <b-button :type="optionC_style" @click="onSubmit('C')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerC}}</b-button>
+                    <b-button :type="optionD_style" @click="onSubmit('D')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerD}}</b-button>
+                </div>
+                <b-notification :type="result_style" v-model="isPicked" >
+                    {{current_q.law}}
+                </b-notification>
+            </div>
+            <div class="column"></div>
+            <div class="buttons">
+                <b-button type="is-primary" @click="onPrev">上一题</b-button>
+                <div class="column"></div>
+                <b-button type="is-primary" @click="onNext">下一题</b-button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@2"></script>
+    <!-- Full bundle -->
+    <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+    <!-- Jquery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Cookie -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.5/js.cookie.min.js"></script>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                isLoading: false,
+                isPicked: false,
+                isCorrect: false,
+                current_i: 0,
+                questions: [
+                    {
+                        "category" : 0,
+                        "index" : 0,
+                        "question" : "测试",
+                        "answerA" : "A. 测试",
+                        "answerB" : "B. 测试",
+                        "answerC" : "C. 测试",
+                        "answerD" : "D. 测试",
+                        "answer" : "C ",
+                        "law" : "测试 "
+                    },
+                    {
+                        "category" : 0,
+                        "index" : 1,
+                        "question" : "测试2",
+                        "answerA" : "A. 测试",
+                        "answerB" : "B. 测试",
+                        "answerC" : "C. 测试",
+                        "answerD" : "D. 测试",
+                        "answer" : "C ",
+                        "law" : "测试 "
+                    }],
+            },
+            created: function(){
+                var self = this;
+                $.getJSON('questions.json', function (data) {
+                    for(var i in data){
+                        self.questions.push(data[i]);
+                    }
+                    //remove test items
+                    if(self.questions.length>2){
+                        self.questions.shift();
+                        self.questions.shift();
+                    }
+                    let x = Cookies.get('question')
+                    if(x && x!=='undefined') 
+                        self.current_i=parseInt(x);
+                });
+            },
+            computed: {
+                current_q: function(){
+                    return this.questions[this.current_i];
+                },
+                result_style: function(){
+                    return this.isCorrect ? 'is-success' : 'is-danger';
+                },
+                optionA_style: function(){
+                    return this.isPicked ? (this.current_q.answer.trim()==='A'? 'is-success' : 'is-danger'):'is-primary';
+                },
+                optionB_style: function(){
+                    return this.isPicked ? (this.current_q.answer.trim()==='B'? 'is-success' : 'is-danger'):'is-primary';
+                },
+                optionC_style: function(){
+                    return this.isPicked ? (this.current_q.answer.trim()==='C'? 'is-success' : 'is-danger'):'is-primary';
+                },
+                optionD_style: function(){
+                    return this.isPicked ? (this.current_q.answer.trim()==='D'? 'is-success' : 'is-danger'):'is-primary';
+                }
+            },
+            methods: {
+                onSubmit: function(pickAnswer){
+                    var self = this;
+                    this.isPicked = true;
+                    this.isCorrect = this.current_q.answer.trim()===pickAnswer;
+                    this.isLoading=true;
+                    if(this.isCorrect) {
+                        setTimeout(function(){
+                            self.onNext();
+                            self.isLoading=false;
+                            Cookies.set('question', self.current_i);
+                        }, 1000);
+                    }
+                },
+                onPrev: function(){
+                    this.isPicked=false;
+                    this.isCorrect=false;
+                    this.current_i--;
+                },
+                onNext: function(){
+                    this.isPicked=false;
+                    this.isCorrect=false;
+                    this.current_i++;
+                },
+                toQuestion: function(){
+                    var self = this;
+                    this.$buefy.dialog.prompt({
+                        message: `请输入序号`,
+                        inputAttrs: {
+                            placeholder: 'e.g. 100',
+                            maxlength: 10
+                        },
+                        trapFocus: true,
+                        onConfirm: function(value){
+                            self.current_i=parseInt(value);
+                        }
+                    })
+                },
+                resetAll: function(){
+                    var self = this;
+                    this.$buefy.dialog.confirm({
+                        message: '是否确定从头开始?',
+                        onConfirm: function(){
+                            self.current_i=0;
+                        }
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+</html>
