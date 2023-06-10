@@ -125,24 +125,35 @@
                     var self = this;
                     this.isPicked = true;
                     this.isCorrect = this.current_q.answer.trim()===pickAnswer;
-                    this.isLoading=true;
+                    this.isLoading = true;
                     if(this.isCorrect) {
                         setTimeout(function(){
                             self.onNext();
-                            self.isLoading=false;
-                            Cookies.set('question', self.current_i);
+                            self.isLoading = false;
                         }, 1000);
                     }
                 },
                 onPrev: function(){
                     this.isPicked=false;
                     this.isCorrect=false;
-                    this.current_i--;
+                    this.isLoading=false;
+                    let index = this.current_i-1;
+                    this.toPage(index);
                 },
                 onNext: function(){
                     this.isPicked=false;
                     this.isCorrect=false;
-                    this.current_i++;
+                    let index = this.current_i+1;
+                    this.toPage(index);
+                },
+                toPage: function(page){
+                    var self=this;
+                    self.isLoading = true;
+                    setTimeout(function(){
+                        self.isLoading = false;
+                        self.current_i = page;
+                        Cookies.set('question', self.current_i);
+                    }, 100);
                 },
                 toQuestion: function(){
                     var self = this;
