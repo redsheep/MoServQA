@@ -24,12 +24,12 @@
         </b-navbar>
         <div class="container is-fluid my-5">
             <div>
-                <div class="title">{{current_q.question}}</div>
+                <div class="title is-5">{{current_q.question}}</div>
                 <div class="buttons mx-5">
-                    <b-button :type="optionA_style" @click="onSubmit('A')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerA}}</b-button>
-                    <b-button :type="optionB_style" @click="onSubmit('B')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerB}}</b-button>
-                    <b-button :type="optionC_style" @click="onSubmit('C')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerC}}</b-button>
-                    <b-button :type="optionD_style" @click="onSubmit('D')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerD}}</b-button>
+                    <b-button style="white-space: pre-line;height:auto;" :type="optionA_style" @click="onSubmit('A')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerA}}</b-button>
+                    <b-button style="white-space: pre-line;height:auto;" :type="optionB_style" @click="onSubmit('B')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerB}}</b-button>
+                    <b-button style="white-space: pre-line;height:auto;" :type="optionC_style" @click="onSubmit('C')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerC}}</b-button>
+                    <b-button style="white-space: pre-line;height:auto;" :type="optionD_style" @click="onSubmit('D')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerD}}</b-button>
                 </div>
                 <b-notification :type="result_style" v-model="isPicked" >
                     {{current_q.law}}
@@ -150,7 +150,7 @@
                         self.isLoading = false;
                         self.current_i = page;
                         Cookies.set('question', self.current_i);
-                        $('#app').focus();
+                        $('button:focus').blur();
                     }, 100);
                 },
                 toQuestion: function(){
