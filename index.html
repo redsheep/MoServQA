@@ -43,7 +43,7 @@
         <div class="container is-fluid my-5" v-if="page=='Question'">
             <div>
                 <div class="title is-5">{{current_q.question}}</div>
-                <div class="buttons mx-5">
+                <div class="buttons mx-5" :key="current_i">
                     <b-button class="wrap-button" :type="optionA_style" @click="onSubmit('A')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerA}}</b-button>
                     <b-button class="wrap-button" :type="optionB_style" @click="onSubmit('B')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerB}}</b-button>
                     <b-button class="wrap-button" :type="optionC_style" @click="onSubmit('C')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerC}}</b-button>
@@ -57,7 +57,7 @@
             <div class="buttons">
                 <b-button type="is-primary" @click="onPrev">上一题</b-button>
                 <div class="column"></div>
-                <b-button ref="btnNext" type="is-primary" @click="onNext">下一题</b-button>
+                <b-button type="is-primary" @click="onNext">下一题</b-button>
             </div>
         </div>
         <div class="container is-fluid my-5" v-if="page=='Category'">
@@ -167,7 +167,6 @@
                     var self = this;
                     this.isPicked = true;
                     this.isCorrect = this.current_q.answer.trim()===pickAnswer;
-                    //this.isLoading = true;
                     if(this.isCorrect) {
                         let notif = this.$buefy.notification.open({
                             duration: 1500,
@@ -178,7 +177,8 @@
                             type: 'is-success',
                         });
                         notif.$on('close', () => {
-                            self.$refs.btnNext.$el.click();
+
+                            self.onNext();
                         });
                     }
                 },
