@@ -178,6 +178,7 @@
                             type: 'is-success',
                         });
                         notif.$on('close', () => {
+                            document.activeElement.blur();
                             self.onNext();
                         });
                     }
@@ -219,8 +220,8 @@
                     setTimeout(function(){
                         self.isLoading = false;
                         self.current_i = page;
-                        Cookies.set('question', self.current_i);
-                        Cookies.set('category', self.category);
+                        Cookies.set('question', self.current_i, { sameSite: 'strict' });
+                        Cookies.set('category', self.category, { sameSite: 'strict' });
                         $('button:focus').blur();
                     }, 100);
                 },
