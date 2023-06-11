@@ -57,7 +57,7 @@
             <div class="buttons">
                 <b-button type="is-primary" @click="onPrev">上一题</b-button>
                 <div class="column"></div>
-                <b-button type="is-primary" @click="onNext">下一题</b-button>
+                <b-button ref="btnNext" type="is-primary" @click="onNext">下一题</b-button>
             </div>
         </div>
         <div class="container is-fluid my-5" v-if="page=='Category'">
@@ -178,8 +178,7 @@
                             type: 'is-success',
                         });
                         notif.$on('close', () => {
-                            document.activeElement.blur();
-                            self.onNext();
+                            self.$refs.btnNext.$el.click();
                         });
                     }
                 },
