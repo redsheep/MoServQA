@@ -49,9 +49,9 @@
                     <b-button class="wrap-button" :type="optionC_style" @click="onSubmit('C')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerC}}</b-button>
                     <b-button class="wrap-button" :type="optionD_style" @click="onSubmit('D')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerD}}</b-button>
                 </div>
-                <b-notification :type="result_style" v-model="isPicked" >
+                <b-message type="is-danger" title="回答错误，参考以下法例/条目" v-show="isPicked && !isCorrect" >
                     {{current_q.law}}
-                </b-notification>
+                </b-message>
             </div>
             <div class="column"></div>
             <div class="buttons">
@@ -61,7 +61,7 @@
             </div>
         </div>
         <div class="container is-fluid my-5" v-if="page=='Category'">
-            <div class="buttons mx-5">
+            <div class="buttons mx-2">
                 <b-button class="wrap-button" @click="chooseCategory(1)" expanded>《中華人民共和國澳門特別行政區基本法》</b-button>
                 <b-button class="wrap-button" @click="chooseCategory(2)" expanded>第 2/1999 號法律《政府組織綱要法》</b-button>
                 <b-button class="wrap-button" @click="chooseCategory(3)" expanded>第 6/1999 號行政法規《政府部門及實體的組織、職權與運作》</b-button>
@@ -167,13 +167,20 @@
                     var self = this;
                     this.isPicked = true;
                     this.isCorrect = this.current_q.answer.trim()===pickAnswer;
-                    /*this.isLoading = true;
+                    //this.isLoading = true;
                     if(this.isCorrect) {
-                        setTimeout(function(){
+                        let notif = this.$buefy.notification.open({
+                            duration: 1500,
+                            progressBar: true,
+                            message: '回答正确',
+                            position: 'is-top',
+                            closable: false,
+                            type: 'is-success',
+                        });
+                        notif.$on('close', () => {
                             self.onNext();
-                            self.isLoading = false;
-                        }, 1000);
-                    }*/
+                        });
+                    }
                 },
                 onPrev: function(){
                     var self = this;
@@ -256,6 +263,7 @@
                 },
                 onStartOver: function(){
                     this.category=1;
+                    this.current_i=0;
                     this.page='Question'
                 }
             }
