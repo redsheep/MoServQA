@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="favicon.png">
     <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
+    <style>
+        .wrap-button{
+            white-space: pre-line;
+            height:auto;
+        }
+    </style>
 </head>
 
 <body>
@@ -13,23 +19,35 @@
             <template #brand>
                 <b-navbar-item>
                     <img src="favicon.png" alt="logo">
-                    <div class="title is-5 pl-3">法例選擇題-學士&高等專科</div>
+                    <div class="title is-5 pl-3">法例選擇題</div>
                 </b-navbar-item>
             </template>
             <template #start>
-                <b-navbar-item href="#">首页</b-navbar-item>
-                <b-navbar-item href="#" @click="toQuestion">选题</b-navbar-item>
-                <b-navbar-item href="#" @click="resetAll">重置</b-navbar-item>
+                <b-navbar-item href="#" @click="toHome">首页</b-navbar-item>
+                <b-navbar-item href="#" @click="toCategory">目錄</b-navbar-item>
+                <b-navbar-item href="#" @click="toQuestion" v-show="page=='Question'">选题</b-navbar-item>
+                <b-navbar-item href="#" @click="resetAll" v-show="page=='Question'">重置</b-navbar-item>
             </template>
         </b-navbar>
-        <div class="container is-fluid my-5">
+        <div class="container is-fluid my-5" v-if="page=='Home'">
+            <div class="content">
+                <div class="title is-5 has-text-centered">學士學位學歷程度的綜合能力評估開考及高等專科學位學歷程度的綜合能力評估開考</div>
+                <div class="title is-5 has-text-centered">《澳門特別行政區基本法》及有關澳門特別行政區公共行政的法例</div>
+                <div class="title is-5 has-text-centered">2019.9 考試範圍</div>
+            </div>
+            <div class="buttons">
+                <b-button type="is-primary" @click="toCategory" outlined expanded>查看目录</b-button>
+                <b-button type="is-primary" @click="onStartOver" outlined expanded>开始答题</b-button>
+            </div>
+        </div>
+        <div class="container is-fluid my-5" v-if="page=='Question'">
             <div>
                 <div class="title is-5">{{current_q.question}}</div>
                 <div class="buttons mx-5">
-                    <b-button style="white-space: pre-line;height:auto;" :type="optionA_style" @click="onSubmit('A')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerA}}</b-button>
-                    <b-button style="white-space: pre-line;height:auto;" :type="optionB_style" @click="onSubmit('B')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerB}}</b-button>
-                    <b-button style="white-space: pre-line;height:auto;" :type="optionC_style" @click="onSubmit('C')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerC}}</b-button>
-                    <b-button style="white-space: pre-line;height:auto;" :type="optionD_style" @click="onSubmit('D')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerD}}</b-button>
+                    <b-button class="wrap-button" :type="optionA_style" @click="onSubmit('A')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerA}}</b-button>
+                    <b-button class="wrap-button" :type="optionB_style" @click="onSubmit('B')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerB}}</b-button>
+                    <b-button class="wrap-button" :type="optionC_style" @click="onSubmit('C')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerC}}</b-button>
+                    <b-button class="wrap-button" :type="optionD_style" @click="onSubmit('D')" :disabled="isLoading" :outlined="!isPicked" expanded>{{current_q.answerD}}</b-button>
                 </div>
                 <b-notification :type="result_style" v-model="isPicked" >
                     {{current_q.law}}
@@ -40,6 +58,18 @@
                 <b-button type="is-primary" @click="onPrev">上一题</b-button>
                 <div class="column"></div>
                 <b-button type="is-primary" @click="onNext">下一题</b-button>
+            </div>
+        </div>
+        <div class="container is-fluid my-5" v-if="page=='Category'">
+            <div class="buttons mx-5">
+                <b-button class="wrap-button" @click="chooseCategory(1)" expanded>《中華人民共和國澳門特別行政區基本法》</b-button>
+                <b-button class="wrap-button" @click="chooseCategory(2)" expanded>第 2/1999 號法律《政府組織綱要法》</b-button>
+                <b-button class="wrap-button" @click="chooseCategory(3)" expanded>第 6/1999 號行政法規《政府部門及實體的組織、職權與運作》</b-button>
+                <b-button class="wrap-button" @click="chooseCategory(4)" expanded>十月十一日第 57/99/M 號法令核准的《行政程序法典》</b-button>
+                <b-button class="wrap-button" @click="chooseCategory(5)" expanded>現行《澳門公共行政工作人員通則》</b-button>
+                <b-button class="wrap-button" @click="chooseCategory(6)" expanded>經第 4/2017 號法律修改的第 14/2009 號法律《公務人員職程制度》</b-button>
+                <b-button class="wrap-button" @click="chooseCategory(7)" expanded>第 12/2015 號法律《公共部門勞動合同制度》</b-button>
+                <b-button class="wrap-button" @click="chooseCategory(8)" expanded>第 31/2004 號行政法規《公共行政工作人員的工作表現評核一般制度》</b-button>
             </div>
         </div>
     </div>
@@ -56,11 +86,13 @@
         new Vue({
             el: '#app',
             data: {
+                page: 'Home',
                 isLoading: false,
                 isPicked: false,
                 isCorrect: false,
                 current_i: 0,
-                questions: [
+                category: 1,
+                all_questions: [
                     {
                         "category" : 0,
                         "index" : 0,
@@ -88,19 +120,29 @@
                 var self = this;
                 $.getJSON('questions.json', function (data) {
                     for(var i in data){
-                        self.questions.push(data[i]);
+                        self.all_questions.push(data[i]);
                     }
                     //remove test items
-                    if(self.questions.length>2){
-                        self.questions.shift();
-                        self.questions.shift();
+                    if(self.all_questions.length>2){
+                        self.all_questions.shift();
+                        self.all_questions.shift();
                     }
+                    //load from cookie
                     let x = Cookies.get('question')
                     if(x && x!=='undefined') 
                         self.current_i=parseInt(x);
+                    let c = Cookies.get('category')
+                    if(c && c!=='undefined') 
+                        self.category=parseInt(c);
                 });
             },
             computed: {
+                questions: function(){
+                    var self=this;
+                    return this.all_questions.filter(function(elm){
+                        return elm.category==self.category;
+                    });
+                },
                 current_q: function(){
                     return this.questions[this.current_i];
                 },
@@ -125,21 +167,42 @@
                     var self = this;
                     this.isPicked = true;
                     this.isCorrect = this.current_q.answer.trim()===pickAnswer;
-                    this.isLoading = true;
+                    /*this.isLoading = true;
                     if(this.isCorrect) {
                         setTimeout(function(){
                             self.onNext();
                             self.isLoading = false;
                         }, 1000);
-                    }
+                    }*/
                 },
                 onPrev: function(){
+                    var self = this;
                     let index = this.current_i-1;
-                    this.toPage(index);
+                    if(index < 0) {
+                        if(self.category==1) return;
+                        this.$buefy.dialog.confirm({
+                            message: '这是本章第一题，是否前往上一章?',
+                            onConfirm: function(){
+                                self.chooseCategory(self.category-1);
+                            }
+                        });
+                    } else {
+                        this.toPage(index);
+                    }
                 },
                 onNext: function(){
                     let index = this.current_i+1;
-                    this.toPage(index);
+                    if(index == this.questions.length) {
+                        if(self.category==8) return;
+                        this.$buefy.dialog.confirm({
+                            message: '这是本章最后一题，是否前往下一章?',
+                            onConfirm: function(){
+                                self.chooseCategory(self.category+1);
+                            }
+                        });
+                    } else {
+                        this.toPage(index);
+                    }
                 },
                 toPage: function(page){
                     var self=this;
@@ -150,20 +213,23 @@
                         self.isLoading = false;
                         self.current_i = page;
                         Cookies.set('question', self.current_i);
+                        Cookies.set('category', self.category);
                         $('button:focus').blur();
                     }, 100);
                 },
                 toQuestion: function(){
                     var self = this;
+                    var maxVal = self.questions.length;
                     this.$buefy.dialog.prompt({
                         message: `请输入序号`,
                         inputAttrs: {
-                            placeholder: 'e.g. 100',
+                            placeholder: '1 ~ ' + maxVal.toString(),
                             maxlength: 10
                         },
                         trapFocus: true,
                         onConfirm: function(value){
-                            self.current_i=parseInt(value);
+                            value = Math.max(0,Math.min(value, maxVal));
+                            self.current_i=parseInt(value-1);
                         }
                     })
                 },
@@ -172,9 +238,25 @@
                     this.$buefy.dialog.confirm({
                         message: '是否确定从头开始?',
                         onConfirm: function(){
+                            self.category=1;
                             self.toPage(0);
                         }
                     })
+                },
+                chooseCategory: function(c){
+                    this.category=Math.max(1,Math.min(c,8));
+                    this.current_i=0;
+                    this.page='Question';
+                },
+                toHome: function(){
+                    this.page='Home';
+                },
+                toCategory: function(){
+                    this.page='Category';
+                },
+                onStartOver: function(){
+                    this.category=1;
+                    this.page='Question'
                 }
             }
         })
